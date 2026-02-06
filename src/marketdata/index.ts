@@ -4,6 +4,7 @@ import { QuoteStore } from "./quoteStore.js";
 import { QuoteCollector } from "./collector.js";
 import { JupiterCollector } from "../venues/solana/jupiter.js";
 import { BinanceCollector } from "../venues/cex/binance.js";
+import { HyperliquidCollector } from "../venues/cex/hyperliquid.js";
 import { ZeroXCollector } from "../venues/evm/zeroX.js";
 import { UniswapCollector } from "../venues/evm/uniswap.js";
 import { Storage } from "../storage/index.js";
@@ -36,6 +37,10 @@ export function initMarketData(
 
   if (config.cex.enabled) {
     collectors.push(new BinanceCollector(config.cex, logger));
+  }
+
+  if (config.hyperliquid.enabled) {
+    collectors.push(new HyperliquidCollector(config.hyperliquid, logger));
   }
 
   collectors.forEach((collector) => {

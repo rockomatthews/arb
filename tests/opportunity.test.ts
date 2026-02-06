@@ -11,6 +11,11 @@ test("findOpportunities detects profitable spread", () => {
     evm: { enabled: false, chains: [], rpcUrls: {} },
     solana: { enabled: false, rpcUrl: "" },
     cex: { enabled: false, venues: [] },
+    hyperliquid: {
+      enabled: false,
+      apiUrl: "https://api.hyperliquid.xyz",
+      coins: []
+    },
     metrics: { enabled: false, port: 9102 },
     storage: { sqlitePath: "arb.sqlite" },
     risk: { minEdgeBps: 5, maxNotionalUsd: 1000, maxSlippageBps: 50 }

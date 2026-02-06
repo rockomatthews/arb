@@ -2,6 +2,7 @@ import { AppConfig } from "../config/index.js";
 import { ZeroXAdapter } from "./adapters/zeroXAdapter.js";
 import { UniswapAdapter } from "./adapters/uniswapAdapter.js";
 import { JupiterAdapter } from "./adapters/jupiterAdapter.js";
+import { HyperliquidAdapter } from "./adapters/hyperliquidAdapter.js";
 
 export type AdapterMap = Record<string, unknown>;
 
@@ -25,6 +26,12 @@ export function buildAdapterMap(config: AppConfig): AdapterMap {
   if (config.solana.enabled && config.solana.rpcUrl) {
     const tokenMap = loadSolanaTokenMap();
     map["jupiter"] = new JupiterAdapter(config.solana.rpcUrl, tokenMap);
+  }
+  if (config.hyperliquid.enabled) {
+    map["hyperliquid"] = new HyperliquidAdapter({
+      apiUrl: config.hyperliquid.apiUrl,
+      coins: config.hyperliquid.coins
+    });
   }
   return map;
 }

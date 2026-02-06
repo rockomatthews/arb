@@ -21,6 +21,11 @@ const ConfigSchema = z.object({
     enabled: z.boolean().default(false),
     venues: z.array(z.string()).default([])
   }),
+  hyperliquid: z.object({
+    enabled: z.boolean().default(false),
+    apiUrl: z.string().default("https://api.hyperliquid.xyz"),
+    coins: z.array(z.string()).default([])
+  }),
   metrics: z.object({
     enabled: z.boolean().default(true),
     port: z.number().default(9102)
@@ -44,6 +49,11 @@ const defaultConfig: AppConfig = {
   evm: { enabled: false, chains: [], rpcUrls: {} },
   solana: { enabled: false, rpcUrl: "" },
   cex: { enabled: false, venues: [] },
+  hyperliquid: {
+    enabled: false,
+    apiUrl: "https://api.hyperliquid.xyz",
+    coins: []
+  },
   metrics: { enabled: true, port: 9102 },
   storage: { sqlitePath: "arb.sqlite" },
   risk: { minEdgeBps: 20, maxNotionalUsd: 2000, maxSlippageBps: 50 }
@@ -80,10 +90,35 @@ export function loadConfig(): AppConfig {
           defaultConfig.metrics.port
       )
     },
+    hyperliquid: {
+      ...defaultConfig.hyperliquid,
+      ...fileConfig.hyperliquid,
+      apiUrl:
+        process.env.ARB_HL_API_URL ??
+        fileConfig.hyperliquid?.apiUrl ??
+        defaultConfig.hyperliquid.apiUrl,
+      coins:
+        (process.env.ARB_HL_COINS
+          ? parseJsonArray(process.env.ARB_HL_COINS)
+          : fileConfig.hyperliquid?.coins) ?? defaultConfig.hyperliquid.coins
+    },
     storage: {
       ...defaultConfig.storage,
       ...fileConfig.storage
     }
   };
   return ConfigSchema.parse(merged);
+}
+
+function parseJsonArray(value?: string): string[] | undefined {
+  if (!value) return undefined;
+  try {
+    const parsed = JSON.parse(value);
+    if (Array.isArray(parsed)) {
+      return parsed.map(String);
+    }
+    return undefined;
+  } catch {
+    return undefined;
+  }
 }
